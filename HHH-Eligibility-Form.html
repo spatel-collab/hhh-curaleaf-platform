@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check your eligibility — Holistic Health Hub</title>
+<style>
+  :root{--white:#fff;--sec:#F7F6F1;--bord:#E5E3DC;--tp:#1A1A18;--ts:#6B6B66;--tt:#9A9A92;--green:#0F6E56;--greenBg:#E1F5EE;--greenSolid:#1D9E75;--amber:#854F0B;--amberBg:#FAEEDA;--red:#A32D2D;--redBg:#FCEBEB;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:#EDEBE4;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:var(--tp);line-height:1.55;}
+  .wrap{max-width:640px;margin:0 auto;padding:18px 16px 60px;}
+  .top{display:flex;align-items:center;gap:10px;padding:6px 0 14px;}
+  .logo{width:38px;height:38px;border-radius:9px;background:var(--greenBg);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;}
+  .top h1{font-size:16px;font-weight:600;margin:0;}
+  .top p{font-size:12px;color:var(--tt);margin:1px 0 0;}
+  .card{background:var(--white);border:1px solid var(--bord);border-radius:14px;padding:20px 18px;margin-bottom:14px;}
+  h2{font-size:20px;font-weight:600;margin:0 0 6px;}
+  .lead{color:var(--ts);font-size:14px;margin:0 0 4px;}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:14px 0 2px;}
+  .step{background:var(--sec);border-radius:10px;padding:11px 12px;}
+  .step .n{font-size:11px;font-weight:700;color:var(--green);}
+  .step h3{font-size:13px;font-weight:600;margin:2px 0 3px;}
+  .step p{font-size:11px;color:var(--ts);margin:0;}
+  .pricetag{display:inline-block;background:var(--greenBg);color:var(--green);font-weight:600;font-size:13px;padding:4px 11px;border-radius:8px;margin-top:12px;}
+  label.fl{display:block;font-size:13px;font-weight:500;margin:14px 0 5px;}
+  label.fl .req{color:var(--red);}
+  input.fi,select.fi{width:100%;font-family:inherit;font-size:15px;padding:11px 12px;border:1px solid var(--bord);border-radius:9px;background:#fff;}
+  input.fi:focus,select.fi:focus{outline:none;border-color:var(--greenSolid);box-shadow:0 0 0 3px var(--greenBg);}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .yn{display:flex;gap:10px;margin-top:6px;}
+  .yn label{flex:1;border:1px solid var(--bord);border-radius:9px;padding:10px;text-align:center;font-size:14px;cursor:pointer;background:#fff;}
+  .yn input{display:none;}
+  .yn input:checked + span{font-weight:600;color:var(--green);}
+  .yn label:has(input:checked){border-color:var(--greenSolid);background:var(--greenBg);}
+  .hint{font-size:12px;color:var(--tt);margin-top:6px;}
+  .hint.warn{color:var(--amber);}
+  .consent{display:flex;gap:9px;align-items:flex-start;margin-top:14px;font-size:13px;color:var(--ts);}
+  .consent input{margin-top:3px;width:16px;height:16px;flex-shrink:0;}
+  a{color:var(--green);}
+  .btn{width:100%;margin-top:20px;background:var(--greenSolid);color:#fff;border:none;font-family:inherit;font-weight:600;font-size:16px;padding:14px;border-radius:10px;cursor:pointer;}
+  .btn:hover{background:#178a66;}
+  .err{background:var(--redBg);color:var(--red);border-radius:9px;padding:10px 12px;font-size:13px;margin-top:14px;display:none;}
+  .result{text-align:center;padding:14px 6px;}
+  .result .ic{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 14px;}
+  .ic.ok{background:var(--greenBg);color:var(--green);} .ic.no{background:var(--redBg);color:var(--red);}
+  .tiny{font-size:12px;color:var(--tt);}
+  .field-err{border-color:var(--red)!important;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="logo">HH</div>
+    <div><h1>Holistic Health Hub</h1><p id="pharmline">Medical cannabis referral service · via your pharmacy</p></div>
+  </div>
+
+  <div id="intro" class="card">
+    <h2>Check if you're eligible</h2>
+    <p class="lead">Complete this short form to see if you’re eligible for an appointment with our partnered specialist clinic for medical cannabis treatment.</p>
+    <div class="steps">
+      <div class="step"><div class="n">01</div><h3>Check eligibility</h3><p>A quick form to see if you qualify for a specialist referral.</p></div>
+      <div class="step"><div class="n">02</div><h3>Online consultation</h3><p>A specialist doctor assesses you and creates a treatment plan.</p></div>
+      <div class="step"><div class="n">03</div><h3>Receive treatment</h3><p>Your prescription is sent to your pharmacy, who arrange payment and collection.</p></div>
+      <div class="step"><div class="n">04</div><h3>Ongoing support</h3><p>We support you at every step of your treatment.</p></div>
+    </div>
+    <span class="pricetag">£30 per consultation with a specialist doctor</span>
+    <p class="tiny" style="margin-top:10px">Treatment is available for over 30 conditions including chronic pain, anxiety and ADHD, across flower, vape, oils and capsules.</p>
+  </div>
+
+  <form id="form" class="card" novalidate>
+    <div class="two">
+      <div><label class="fl">First name <span class="req">*</span></label><input class="fi" id="first" autocomplete="given-name"></div>
+      <div><label class="fl">Surname <span class="req">*</span></label><input class="fi" id="last" autocomplete="family-name"></div>
+    </div>
+    <div class="two">
+      <div><label class="fl">Date of birth <span class="req">*</span></label><input class="fi" id="dob" type="date"></div>
+      <div><label class="fl">Postcode <span class="req">*</span></label><input class="fi" id="postcode" autocomplete="postal-code"></div>
+    </div>
+    <div class="two">
+      <div><label class="fl">Phone number <span class="req">*</span></label><input class="fi" id="phone" type="tel" autocomplete="tel"></div>
+      <div><label class="fl">Email <span class="req">*</span></label><input class="fi" id="email" type="email" autocomplete="email"></div>
+    </div>
+
+    <label class="fl">Condition you’d like treatment for <span class="req">*</span></label>
+    <select class="fi" id="condition"><option value="">Select from the list…</option></select>
+
+    <label class="fl">Have you previously tried at least two treatments or therapies? <span class="req">*</span></label>
+    <div class="yn" id="tried">
+      <label><input type="radio" name="tried" value="yes"><span>Yes</span></label>
+      <label><input type="radio" name="tried" value="no"><span>No</span></label>
+    </div>
+    <div class="hint warn">You must have tried at least two other licensed medications to be eligible.</div>
+
+    <label class="fl">Have you, or an immediate family member, been diagnosed with psychosis or schizophrenia? <span class="req">*</span></label>
+    <div class="yn" id="psych">
+      <label><input type="radio" name="psych" value="yes"><span>Yes</span></label>
+      <label><input type="radio" name="psych" value="no"><span>No</span></label>
+    </div>
+
+    <label class="consent"><input type="checkbox" id="c1"><span>I am aware of the costs associated with the appointment and medicine and would like to be referred to a specialist. <span class="req">*</span></span></label>
+    <label class="consent"><input type="checkbox" id="c2"><span>I consent to my information being gathered and shared between healthcare services as per the terms of use. <span class="req">*</span></span></label>
+    <label class="consent"><input type="checkbox" id="c3"><span>I would like to receive exclusive offers on products and services. (optional)</span></label>
+
+    <label class="fl">How did you hear about the service?</label>
+    <select class="fi" id="source"><option value="">Select…</option><option>Text</option><option>Poster / Leaflet</option><option>Word of mouth</option><option>Google</option><option>Other</option></select>
+
+    <div class="err" id="err"></div>
+    <button type="button" class="btn" onclick="submitForm()">Check my eligibility</button>
+    <p class="tiny" style="text-align:center;margin-top:12px">🔒 Your information is handled securely and shared only with your pharmacy and the specialist clinic.</p>
+  </form>
+
+  <div id="resultCard" class="card" style="display:none"><div id="result" class="result"></div></div>
+</div>
+
+<script>
+const CONDITIONS=["Agoraphobia","Anorexia","Anxiety","Arthritis","Autism Spectrum Disorder","Back Pain","Binge Eating Disorder (BED)","Bulimia Nervosa","Cancer-related Appetite Loss","Cancer-related Pain","Chemotherapy-induced Nausea & Vomiting","Crohn’s Disease","Chronic Pain","Cluster Headache","Complex Regional Pain Syndrome","Depression","Eating Disorders","Ehlers-Danlos Syndromes (EDS)","Endometriosis","Epilepsy","Fibromyalgia","Insomnia","Migraine","Multiple Sclerosis","Musculoskeletal Pain","Neuropathic Pain","Obsessive-Compulsive Disorder (OCD)","Palliative Care","Parkinson’s Disease","Post-Traumatic Stress Disorder (PTSD)","Sciatica","Tourette’s Syndrome","Ulcerative Colitis"];
+const PHARMACIES={ "demo-token":"East Midlands Pharmacy Lincoln" };
+(function(){
+  const sel=document.getElementById('condition');
+  CONDITIONS.forEach(c=>{const o=document.createElement('option');o.textContent=c;sel.appendChild(o);});
+  const t=new URLSearchParams(location.search).get('token');
+  const ph=PHARMACIES[t]||'East Midlands Pharmacy Lincoln';
+  document.getElementById('pharmline').textContent='Medical cannabis referral service · via '+ph;
+  window.PHARMACY_NAME=ph;
+})();
+function val(id){return document.getElementById(id).value.trim();}
+function radio(name){const el=document.querySelector('input[name="'+name+'"]:checked');return el?el.value:'';}
+function submitForm(){
+  const err=document.getElementById('err'); err.style.display='none';
+  document.querySelectorAll('.field-err').forEach(e=>e.classList.remove('field-err'));
+  const req=[['first','first'],['last','last'],['dob','dob'],['postcode','postcode'],['phone','phone'],['email','email'],['condition','condition']];
+  let missing=[];
+  req.forEach(([id])=>{ if(!val(id)){ missing.push(id); document.getElementById(id).classList.add('field-err'); } });
+  const tried=radio('tried'), psych=radio('psych');
+  if(!tried) missing.push('tried'); if(!psych) missing.push('psych');
+  const c1=document.getElementById('c1').checked, c2=document.getElementById('c2').checked;
+  if(missing.length){ err.textContent='Please complete all required fields.'; err.style.display='block'; window.scrollTo({top:document.getElementById('form').offsetTop-20,behavior:'smooth'}); return; }
+  if(!c1||!c2){ err.textContent='Please confirm the two required consents to continue.'; err.style.display='block'; return; }
+
+  // eligibility logic
+  let eligible=true, reason='';
+  if(tried==='no'){ eligible=false; reason='To be eligible, you must have previously tried at least two other licensed medications or therapies for your condition.'; }
+  else if(psych==='yes'){ eligible=false; reason='Because you or an immediate family member has been diagnosed with psychosis or schizophrenia, we are unfortunately unable to refer you for this treatment at this time.'; }
+
+  document.getElementById('intro').style.display='none';
+  document.getElementById('form').style.display='none';
+  const rc=document.getElementById('resultCard'); rc.style.display='block';
+  const r=document.getElementById('result');
+  const name=val('first');
+  if(eligible){
+    r.innerHTML=`<div class="ic ok">✓</div>
+      <h2>Good news, ${name} — you’re eligible</h2>
+      <p class="lead">Your enquiry has been sent to <strong>${window.PHARMACY_NAME}</strong>. A member of the team will be in touch to arrange your specialist consultation (£30) and explain the next steps.</p>
+      <p class="tiny" style="margin-top:12px">Reference: HHH-${Math.floor(100000+Math.random()*899999)} · ${new Date().toLocaleDateString('en-GB')}</p>`;
+  } else {
+    r.innerHTML=`<div class="ic no">!</div>
+      <h2>You’re not eligible right now</h2>
+      <p class="lead">${reason}</p>
+      <p class="tiny" style="margin-top:12px">If your circumstances change, you’re welcome to check again. You can also speak to your pharmacy, ${window.PHARMACY_NAME}, for advice.</p>`;
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>

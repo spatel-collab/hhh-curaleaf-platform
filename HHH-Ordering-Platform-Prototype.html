@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HHH Ordering Platform — Clickable Prototype</title>
+<style>
+  :root{
+    --white:#fff; --sec:#F7F6F1; --bord:#E5E3DC; --tp:#1A1A18; --ts:#6B6B66; --tt:#9A9A92;
+    --green:#0F6E56; --greenBg:#E1F5EE; --greenSolid:#1D9E75; --amber:#854F0B; --amberBg:#FAEEDA;
+    --red:#A32D2D; --redBg:#FCEBEB; --infoBg:#E6F1FB; --infoT:#185FA5;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#EDEBE4;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:var(--tp);padding:24px;}
+  .app{max-width:980px;margin:0 auto;background:var(--white);border:1px solid var(--bord);border-radius:14px;overflow:hidden;}
+  .header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--sec);border-bottom:1px solid var(--bord);}
+  .brand{display:flex;align-items:center;gap:11px;}
+  .logo{width:36px;height:36px;border-radius:8px;background:var(--greenBg);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;}
+  .brand h1{font-size:15px;font-weight:600;margin:0;}
+  .brand p{font-size:11px;color:var(--tt);margin:1px 0 0;}
+  .tabs{display:flex;gap:22px;padding:0 18px;border-bottom:1px solid var(--bord);}
+  .tab{padding:12px 2px;font-size:13px;color:var(--ts);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;}
+  .tab.active{color:var(--tp);font-weight:600;border-bottom-color:var(--tp);}
+  .badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--infoT);color:#fff;font-size:10px;font-weight:600;margin-left:6px;line-height:1;vertical-align:middle;}
+  .badge.attn{background:var(--amber);}
+  .body{padding:18px;}
+  .screen{display:none;} .screen.active{display:block;}
+  h2{font-size:15px;font-weight:600;margin:0 0 12px;}
+  .muted{color:var(--ts);} .tiny{font-size:11px;color:var(--tt);}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;font-size:11px;font-weight:600;color:var(--ts);padding:8px 6px;border-bottom:1px solid var(--bord);position:sticky;top:0;background:var(--white);z-index:1;}
+  td{padding:10px 6px;border-bottom:1px solid var(--bord);}
+  .right{text-align:right;}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle;}
+  .g{background:var(--greenSolid);} .a{background:#EF9F27;} .r{background:#E24B4A;}
+  .pos{color:var(--green);font-weight:600;} .warnT{color:var(--amber);font-weight:600;}
+  .row-low{background:var(--amberBg);} .row-out{opacity:.5;}
+  button.btn{font-family:inherit;font-size:12px;border:1px solid var(--bord);background:var(--white);color:var(--tp);padding:5px 11px;border-radius:7px;cursor:pointer;}
+  button.btn:hover{background:var(--sec);}
+  button.btn:disabled{opacity:.45;cursor:not-allowed;}
+  button.primary{background:var(--greenSolid);color:#fff;border-color:transparent;font-weight:600;}
+  button.primary:hover{background:#178a66;}
+  .grid{display:grid;grid-template-columns:1.6fr 1fr;gap:0;border-top:1px solid var(--bord);margin:0 -18px -18px;}
+  .col-main{padding:18px;border-right:1px solid var(--bord);}
+  .col-side{padding:18px;background:var(--sec);}
+  .steps{display:flex;align-items:center;gap:7px;font-size:12px;margin:-4px -18px 16px;padding:11px 18px;background:var(--sec);border-bottom:1px solid var(--bord);flex-wrap:wrap;}
+  .step{display:flex;align-items:center;gap:6px;color:var(--tt);}
+  .step .num{width:18px;height:18px;border-radius:50%;border:1px solid var(--bord);display:flex;align-items:center;justify-content:center;font-size:11px;}
+  .step.done{color:var(--green);} .step.done .num{background:var(--greenBg);border-color:transparent;color:var(--green);}
+  .step.cur{color:var(--tp);font-weight:600;} .step.cur .num{background:var(--infoBg);border-color:transparent;color:var(--infoT);}
+  .sec-h{font-size:12px;font-weight:600;color:var(--ts);margin:16px 0 8px;display:flex;align-items:center;gap:7px;}
+  .sec-h .n{width:18px;height:18px;border-radius:50%;background:var(--tp);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;}
+  .card{background:var(--white);border:1px solid var(--bord);border-radius:8px;padding:11px 13px;margin-bottom:9px;}
+  .card.editing{border:2px solid var(--infoT);}
+  .card.placed{background:var(--sec);}
+  .rxcard{border:1px solid var(--bord);border-radius:8px;padding:12px;margin-bottom:10px;background:#fff;}
+  .rxhd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px;}
+  .upload{display:flex;align-items:center;gap:11px;border:1px dashed var(--bord);border-radius:8px;padding:10px;margin-bottom:10px;}
+  .upload.has{border-style:solid;}
+  .fileicon{width:32px;height:32px;border-radius:7px;background:var(--infoBg);color:var(--infoT);display:flex;align-items:center;justify-content:center;font-size:15px;}
+  .pill{font-size:12px;padding:4px 9px;border-radius:7px;display:inline-flex;align-items:center;gap:5px;}
+  .pill.ok{background:var(--greenBg);color:var(--green);} .pill.miss{background:var(--redBg);color:var(--red);}
+  .pill.amber{background:var(--amberBg);color:var(--amber);} .pill.info{background:var(--infoBg);color:var(--infoT);}
+  .pill.neutral{background:var(--sec);color:var(--ts);}
+  .patrow{cursor:pointer;border-radius:8px;} .patrow:hover{background:var(--sec);}
+  .flash{box-shadow:0 0 0 2px var(--greenSolid);transition:box-shadow .3s;}
+  input.fi,select.fi{width:100%;font-family:inherit;font-size:13px;padding:8px 10px;border:1px solid var(--bord);border-radius:7px;background:#fff;}
+  input.tiny-in{font-family:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--bord);border-radius:6px;background:#fff;width:150px;}
+  .searchrow{display:flex;gap:8px;margin-bottom:10px;}
+  .itemlist{border:1px solid var(--bord);border-radius:8px;overflow:hidden;}
+  .iblock{padding:9px 10px;border-bottom:1px solid var(--bord);} .iblock:last-child{border-bottom:none;}
+  .itop{display:flex;align-items:center;justify-content:space-between;font-size:13px;}
+  .qty{display:inline-flex;align-items:center;gap:8px;}
+  .qtybtn{width:22px;height:22px;border-radius:5px;border:1px solid var(--bord);background:#fff;cursor:pointer;font-size:13px;line-height:1;}
+  .imeta{display:flex;align-items:center;gap:10px;margin-top:6px;font-size:11px;flex-wrap:wrap;}
+  .feebar{margin-top:8px;background:var(--amberBg);border-radius:7px;padding:7px 9px;font-size:11px;color:var(--amber);}
+  .feebtns{display:inline-flex;gap:5px;margin-left:4px;}
+  .feebtn{font-size:11px;border:1px solid #E6C98A;background:#fff;color:var(--amber);border-radius:6px;padding:2px 8px;cursor:pointer;}
+  .feebtn.on{background:var(--amber);color:#fff;border-color:var(--amber);}
+  .empty{padding:13px;text-align:center;color:var(--tt);font-size:13px;font-style:italic;}
+  .totline{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;}
+  .patcard{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--bord);border-radius:8px;padding:11px;}
+  .avatar{width:38px;height:38px;border-radius:50%;background:var(--infoBg);color:var(--infoT);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;flex-shrink:0;}
+  .paybox{border:1px solid var(--bord);border-radius:8px;padding:12px;background:#fff;}
+  .paybox.paid{border-color:var(--greenSolid);background:var(--greenBg);}
+  .chip{display:inline-block;font-size:12px;padding:5px 10px;border:1px solid var(--bord);border-radius:20px;background:#fff;cursor:pointer;margin:0 6px 6px 0;}
+  .chip.active{background:var(--tp);color:#fff;border-color:var(--tp);}
+  .assign{margin-top:10px;background:var(--sec);border:1px solid var(--bord);border-radius:8px;padding:11px;}
+  .assign h3{font-size:13px;margin:0 0 8px;} .assign .opt{display:block;width:100%;text-align:left;margin-bottom:6px;}
+  .banner{padding:10px 13px;border-radius:8px;font-size:12px;margin-bottom:12px;display:flex;gap:8px;}
+  .banner.amber{background:var(--amberBg);color:var(--amber);} .banner.green{background:var(--greenBg);color:var(--green);}
+  .track{display:flex;gap:6px;margin:10px 0;}
+  .tstep{flex:1;text-align:center;font-size:10px;color:var(--tt);}
+  .tbar{height:4px;border-radius:3px;background:var(--bord);margin-bottom:5px;}
+  .tstep.done .tbar{background:var(--greenSolid);} .tstep.done{color:var(--green);}
+  .kv{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;}
+  a.link{color:var(--infoT);cursor:pointer;text-decoration:none;} a.link:hover{text-decoration:underline;}
+  .modalwrap{min-height:360px;background:rgba(20,20,18,0.45);display:flex;align-items:center;justify-content:center;border-radius:10px;padding:20px;}
+  .phone{width:300px;background:#fff;border-radius:18px;border:1px solid var(--bord);overflow:hidden;}
+  .phonehd{background:var(--sec);padding:10px 14px;font-size:12px;color:var(--ts);border-bottom:1px solid var(--bord);}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="brand">
+      <div class="logo">HH</div>
+      <div><h1>Holistic Health Hub — Ordering &amp; Payments</h1><p>Live formulary via Curaleaf Rocky API · patient records via HHH CRM</p></div>
+    </div>
+    <div class="muted" style="font-size:12px;">S. Patel</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-scr="home" onclick="go('home')">Home <span class="badge" id="b-home" style="display:none"></span></button>
+    <button class="tab" data-scr="referrals" onclick="go('referrals')">Referrals <span class="badge" id="b-referrals" style="display:none"></span></button>
+    <button class="tab" data-scr="formulary" onclick="go('formulary')">Formulary</button>
+    <button class="tab" data-scr="create" onclick="go('create')">Create order <span class="badge" id="b-create" style="display:none"></span></button>
+    <button class="tab" data-scr="review" onclick="go('review')">Awaiting payment <span class="badge" id="b-review" style="display:none"></span></button>
+    <button class="tab" data-scr="orders" onclick="go('orders')">Orders <span class="badge" id="b-orders" style="display:none"></span></button>
+    <button class="tab" data-scr="patients" onclick="go('patients')">Patients</button>
+  </div>
+
+  <div class="body">
+    <div class="screen active" id="scr-home"><div id="home-body"></div></div>
+    <div class="screen" id="scr-referrals"><div id="referrals-body"></div></div>
+    <div class="screen" id="scr-formulary">
+      <h2>Formulary</h2>
+      <p class="muted" style="font-size:13px;margin-top:-6px;">Live formulary from Curaleaf. Search for a product, check stock and price, then assign it to a patient's prescription.</p>
+      <div class="searchrow" style="margin-bottom:10px"><input class="fi" id="catsearch" placeholder="Search the formulary by product name…" oninput="renderFormulary()" autocomplete="off"><button class="btn" onclick="clearCatSearch()">Clear</button></div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px"><span class="tiny" style="margin-right:2px">Filter by type:</span><div id="cat-filters" style="display:inline"></div></div>
+      <div id="cat-count" class="tiny" style="margin-bottom:6px"></div>
+      <div id="cat-scroll" style="max-height:336px;overflow:auto;border:1px solid var(--bord);border-radius:8px"><table id="cat-table"></table></div>
+      <div id="assign-box"></div>
+      <div class="banner amber" style="margin-top:12px;"><span>⚠</span><span>Items below 25% margin are flagged. Apply a £5–15 dispensing fee on the line item to protect margin.</span></div>
+    </div>
+
+    <div class="screen" id="scr-create">
+      <div class="steps" id="stepbar"></div>
+      <div style="margin-bottom:12px;"><span class="tiny">Patient order:</span><br><div id="po-chips" style="margin-top:6px;"></div></div>
+      <div id="builder"></div>
+    </div>
+
+    <div class="screen" id="scr-review"><h2>Awaiting payment</h2><div id="review-body"></div></div>
+    <div class="screen" id="scr-orders"><h2>Orders</h2><div id="orders-body"></div></div>
+    <div class="screen" id="scr-patients">
+      <h2 style="margin-bottom:2px">Patients</h2>
+      <p class="tiny" style="margin:0 0 10px">Everyone who has interacted with the service — from eligibility enquiry through to collection.</p>
+      <div class="searchrow" style="margin-bottom:6px"><input class="fi" id="patsearch" placeholder="Search patients by name or email…" oninput="renderPatients()" autocomplete="off"></div>
+      <div id="patients-count" class="tiny" style="margin-bottom:8px"></div>
+      <div id="patients-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const catalogue = [
+  {name:'Adven 20/1 THC Oil 30ml', cost:42, retail:79, stock:'in', type:'oil'},
+  {name:'Curaleaf CBD 50 Oil 50ml', cost:30, retail:59, stock:'in', type:'oil'},
+  {name:'Khiron 20/1 Oil 30ml', cost:40, retail:75, stock:'in', type:'oil'},
+  {name:'Noidecs T10:C10 Flos 10g', cost:38.5, retail:48, stock:'low', type:'flos'},
+  {name:'Adven Cura-22 Flos 10g', cost:44, retail:82, stock:'out', type:'flos'},
+  {name:'Adven THC 10mg Capsules ×30', cost:36, retail:69, stock:'in', type:'capsule'},
+  {name:'Noidecs CBD Lozenge 25mg ×30', cost:28, retail:55, stock:'low', type:'lozenge'},
+  {name:'Curaleaf 510 Vape Cartridge 0.5g', cost:34, retail:64, stock:'in', type:'vape'},
+];
+const TYPE_LABELS={flos:'Flower (Flos)',oil:'Oil',capsule:'Capsule',lozenge:'Lozenge',vape:'Vape'};
+let crm = [
+  {id:'P-1001', name:'James Doe',        email:'j.doe@email.com',      mobile:'07700 900111', address:'12 High St, Leeds LS1 4AB',     status:'Referred'},
+  {id:'P-1002', name:'Aisha Smith',      email:'a.smith@email.com',    mobile:'07700 900222', address:'4 Oak Rd, Leeds LS2 8PQ',       status:'Referred'},
+  {id:'P-1003', name:'Mohammed Khan',    email:'m.khan@email.com',     mobile:'07700 900333', address:'9 Park Ave, Leeds LS6 1RT',     status:'Referred'},
+  {id:'P-1004', name:'Sophie Bennett',   email:'s.bennett@email.com',  mobile:'07700 900444', address:'27 Cardigan Rd, Leeds LS6 3AA', status:'Referred'},
+  {id:'P-1005', name:"Daniel O'Connor",  email:'d.oconnor@email.com',  mobile:'07700 900555', address:'8 Burley St, Leeds LS3 1JX',    status:'Referred'},
+  {id:'P-1006', name:'Priya Patel',      email:'p.patel@email.com',    mobile:'07700 900666', address:'15 Roundhay Rd, Leeds LS8 5AQ', status:'Referred'},
+  {id:'P-1007', name:'Liam Murphy',      email:'l.murphy@email.com',   mobile:'07700 900777', address:'3 Kirkstall Ln, Leeds LS5 3BW', status:'Referred'},
+  {id:'P-1008', name:'Grace Thompson',   email:'g.thompson@email.com', mobile:'07700 900888', address:'41 Otley Rd, Leeds LS16 5JT',   status:'Referred'},
+  {id:'P-1009', name:'Omar Farah',       email:'o.farah@email.com',    mobile:'07700 900999', address:'6 Dewsbury Rd, Leeds LS11 5DQ', status:'Referred'},
+  {id:'P-1010', name:'Charlotte Wright', email:'c.wright@email.com',   mobile:'07700 900123', address:'22 Street Ln, Leeds LS8 1AP',   status:'Referred'},
+  {id:'P-1011', name:'Ethan Clarke',     email:'e.clarke@email.com',   mobile:'07700 900234', address:'18 Hyde Park Rd, Leeds LS6 1PY', status:'Referred'},
+  {id:'P-1012', name:'Maria Gonzalez',   email:'m.gonzalez@email.com', mobile:'07700 900345', address:'9 Chapeltown Rd, Leeds LS7 4DX', status:'Referred'},
+  {id:'P-1013', name:'Hannah Lewis',     email:'h.lewis@email.com',    mobile:'07700 900456', address:'33 Meanwood Rd, Leeds LS7 2JL',  status:'Referred'},
+];
+// ---- Referral / eligibility intake (pharmacy level) ----
+const PHARMACY = {name:'Holistic Health Hub Pharmacy — Leeds', formUrl:'hhh.health/eligibility/leeds-ls1'};
+const REFSTATUS = ['New','Records uploaded','Referred to clinic','Completed'];
+let nextSub=0, nextCln=5200, nextCrm=2000;
+function blankSub(o){return Object.assign({id:++nextSub,status:'New',recordsUploaded:false,calls:[],clinicRef:null,emailedAt:null,submittedAt:new Date()},o);}
+let submissions=[
+  blankSub({name:'Tom Hughes',    dob:'1989-04-12', mobile:'07700 900501', email:'t.hughes@email.com', postcode:'LS1 6PJ', condition:'Chronic Pain', tried2:true, psychExclusion:false, consentReferral:true, consentShare:true, marketing:false, source:'Google'}),
+  blankSub({name:'Rebecca Allen', dob:'1994-11-02', mobile:'07700 900502', email:'r.allen@email.com',  postcode:'LS2 8PQ', condition:'Anxiety',      tried2:true, psychExclusion:false, consentReferral:true, consentShare:true, marketing:true,  source:'Word of mouth'}),
+];
+(function(){
+  const s3=blankSub({name:'Daniel Price', dob:'1977-07-23', mobile:'07700 900503', email:'d.price@email.com', postcode:'LS2 7DR', condition:'Chronic Pain', tried2:true, psychExclusion:false, consentReferral:true, consentShare:true, marketing:false, source:'Poster / Leaflet'});
+  s3.recordsUploaded=true; s3.status='Records uploaded'; submissions.push(s3);
+  const s4=blankSub({name:'Sara Knight', dob:'1985-02-15', mobile:'07700 900504', email:'s.knight@email.com', postcode:'LS1 5DA', condition:'Insomnia', tried2:true, psychExclusion:false, consentReferral:true, consentShare:true, marketing:false, source:'Text'});
+  s4.recordsUploaded=true; s4.clinicRef='CLN-'+(nextCln++); s4.status='Referred to clinic'; submissions.push(s4);
+})();
+const subById=id=>submissions.find(s=>s.id===id);
+function uploadRecords(id){const s=subById(id);s.recordsUploaded=true;if(s.status==='New')s.status='Records uploaded';rerender();}
+function logCall(id){subById(id).calls.push({ts:new Date()});rerender();}
+function referToClinic(id){const s=subById(id);if(!s.recordsUploaded)return;s.clinicRef='CLN-'+(nextCln++);s.status='Referred to clinic';rerender();}
+function emailReferral(id){const s=subById(id);if(!s.clinicRef)return;s.emailedAt=new Date();s.status='Completed';
+  if(!crm.find(c=>c.email===s.email)) crm.push({id:'P-'+(nextCrm++),name:s.name,email:s.email,mobile:s.mobile,address:s.postcode,status:'Referred'});
+  rerender();}
+function subCard(s){
+  const si=REFSTATUS.indexOf(s.status);
+  const pill=s.status==='Completed'?'<span class="pill ok">✓ Referred</span>':(s.status==='Referred to clinic'?'<span class="pill info">Referred to clinic</span>':(s.status==='Records uploaded'?'<span class="pill amber">Records uploaded</span>':'<span class="pill miss">New</span>'));
+  const track=REFSTATUS.map((l,i)=>`<div class="tstep ${i<=si?'done':''}"><div class="tbar"></div>${l.split(' ')[0]}</div>`).join('');
+  let actions='';
+  if(s.status!=='Completed'){
+    let acts=[];
+    if(!s.recordsUploaded) acts.push(`<button class="btn primary" onclick="uploadRecords(${s.id})">Upload health records</button>`);
+    if(s.recordsUploaded && !s.clinicRef) acts.push(`<button class="btn primary" onclick="referToClinic(${s.id})">Refer to Curaleaf Clinic</button>`);
+    if(s.clinicRef && !s.emailedAt) acts.push(`<button class="btn primary" onclick="emailReferral(${s.id})">Email patient (confirm referral)</button>`);
+    acts.push(`<button class="btn" onclick="logCall(${s.id})">Log call</button>`);
+    actions=`<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">${acts.join('')}</div>`;
+  } else {
+    actions=`<div class="tiny" style="margin-top:8px;color:var(--green)">✓ Referral complete — ${s.name} added to the CRM and available in <a class="link" onclick="go('create')">Create order</a>.</div>`;
+  }
+  let logs=[];
+  if(s.recordsUploaded) logs.push('Health records uploaded');
+  s.calls.forEach(c=>logs.push('Call logged · '+fmtTime(c.ts)));
+  if(s.clinicRef) logs.push('Referred to Curaleaf Clinic · '+s.clinicRef);
+  if(s.emailedAt) logs.push('Referral confirmation emailed to '+s.email+' · '+fmtTime(s.emailedAt));
+  const log=logs.length?`<div style="margin-top:8px;border-top:1px solid var(--bord);padding-top:6px"><div class="tiny" style="font-weight:600;margin-bottom:2px">Processing log</div>${logs.map(l=>`<div class="tiny">• ${l}</div>`).join('')}</div>`:'';
+  return `<div class="card" id="sub-${s.id}">
+    <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600;font-size:13px">${s.name}</span>${pill}</div>
+    <div class="tiny" style="margin:3px 0 6px">${s.condition} · DOB ${s.dob} · ${s.email} · ${s.mobile} · ${s.postcode||''}</div>
+    <div class="tiny" style="margin-bottom:4px">Eligibility: tried ≥2 treatments — ${s.tried2?'Yes':'No'} · psychosis/schizophrenia (self or family) — ${s.psychExclusion?'Yes':'No'}</div>
+    <div class="tiny" style="margin-bottom:6px">Consents: costs &amp; referral — ${s.consentReferral?'Yes':'No'} · share info — ${s.consentShare?'Yes':'No'} · marketing — ${s.marketing?'Yes':'No'} · heard via: ${s.source||'—'}</div>
+    <div class="track">${track}</div>${actions}${log}</div>`;
+}
+function renderReferrals(){
+  let html=`<h2 style="margin-bottom:2px">Referrals</h2>
+    <p class="tiny" style="margin:0 0 12px">${PHARMACY.name}</p>
+    <div class="card" style="margin-bottom:14px"><div class="tiny">Eligibility submissions arrive via this pharmacy’s form / QR code:</div><div style="font-size:13px;font-weight:600;margin-top:3px">${PHARMACY.formUrl}</div></div>`;
+  if(!submissions.length){ document.getElementById('referrals-body').innerHTML=html+'<div class="empty">No submissions yet.</div>'; return; }
+  const order=REFSTATUS;
+  submissions.slice().sort((a,b)=>order.indexOf(a.status)-order.indexOf(b.status)).forEach(s=>{ html+=subCard(s); });
+  document.getElementById('referrals-body').innerHTML=html;
+}
+// ---- Patients directory ----
+function allPatients(){
+  const map={};
+  crm.forEach(c=>{ map[c.email]={name:c.name,email:c.email,mobile:c.mobile,address:c.address,crmId:c.id}; });
+  submissions.forEach(s=>{ const e=map[s.email]||{name:s.name,email:s.email,mobile:s.mobile,address:s.address}; e.submission=s; map[s.email]=e; });
+  return Object.values(map).sort((a,b)=>a.name.localeCompare(b.name));
+}
+function patientStatus(p){
+  const c=crm.find(x=>x.email===p.email);
+  const orders=c?porders.filter(o=>o.patientId===c.id):[];
+  if(orders.length){
+    let R=null,F=null,H=null,A=null,N=null;
+    orders.forEach(o=>{
+      if(o.payment.status==='sent' && !A) A=o.id;
+      if(o.payment.status==='none' && !N) N=o.id;
+      o.prescriptions.forEach(r=>{ if(r.placed&&r.status===3){if(!R)R={o:o.id,r:r.id};} else if(r.placed){if(!F)F={o:o.id,r:r.id};} if(r.held&&!H)H={o:o.id,r:r.id}; });
+    });
+    if(R) return {label:'Ready for collection',tone:'green',scr:'orders',anchor:'ord-'+R.o+'-'+R.r};
+    if(F) return {label:'In fulfilment',tone:'info',scr:'orders',anchor:'ord-'+F.o+'-'+F.r};
+    if(H) return {label:'Held — review',tone:'red',scr:'review',anchor:'rev-'+H.o};
+    if(A) return {label:'Awaiting payment',tone:'amber',scr:'review',anchor:'rev-'+A};
+    if(N) return {label:'Order in progress',tone:'info',scr:'create',poId:N};
+  }
+  if(c) return {label:'Referred',tone:'green',scr:'create'};
+  const s=p.submission;
+  if(s){ const a='sub-'+s.id;
+    if(s.status==='Referred to clinic')return {label:'Referred to clinic',tone:'info',scr:'referrals',anchor:a};
+    if(s.status==='Records uploaded')return {label:'Records uploaded',tone:'amber',scr:'referrals',anchor:a};
+    if(s.status==='Completed')return {label:'Referred',tone:'green',scr:'create'};
+    return {label:'New enquiry',tone:'neutral',scr:'referrals',anchor:a};
+  }
+  return {label:'—',tone:'neutral',scr:'patients'};
+}
+function toneClass(t){return ({green:'ok',info:'info',amber:'amber',red:'miss',neutral:'neutral'})[t]||'neutral';}
+function renderPatients(){
+  const el=document.getElementById('patsearch'); const q=(el?el.value:'').toLowerCase().trim();
+  const list=allPatients().filter(p=>!q||p.name.toLowerCase().includes(q)||(p.email&&p.email.toLowerCase().includes(q)));
+  const rows=list.length?list.map(p=>{const st=patientStatus(p);
+    return `<div class="totline patrow" style="align-items:center;padding:9px 8px;border-bottom:1px solid var(--bord)" onclick="goPatientRow('${st.scr}',${st.poId||'null'},'${st.anchor||''}')"><span><span style="font-weight:600;font-size:13px">${p.name}</span><br><span class="tiny">${p.email||''}${p.mobile?' · '+p.mobile:''}</span></span><span style="display:flex;align-items:center;gap:8px"><span class="pill ${toneClass(st.tone)}">${st.label}</span><span class="tiny" style="color:var(--tt)">›</span></span></div>`;
+  }).join(''):'<div class="empty">No patients match.</div>';
+  const cc=document.getElementById('patients-count'); if(cc) cc.textContent=list.length+' patient(s)';
+  document.getElementById('patients-list').innerHTML=rows;
+}
+function goPatientRow(scr,poId,anchor){ if(poId) activePO=poId; go(scr); if(anchor) setTimeout(function(){scrollToAnchor(anchor);},60); }
+function scrollToAnchor(id){ const el=document.getElementById(id); if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('flash'); setTimeout(function(){el.classList.remove('flash');},1600); } }
+const STATUSES=['Awaiting supplier approval','Approved','Dispatched to pharmacy','Ready for collection'];
+let nextPat=0,nextRx=0,nextInv=4072,nextPO=88010;
+let porders=[], activePO=null, pendingProduct=null, autoPlace=true;
+let catFilters=new Set();
+let homeView='today';
+const H=3600000, REMIND=[24,48]; let clockMs=0, expiryHrs=72;
+
+function blankRx(){return {id:++nextRx,prescriber:'',copy:null,supplier:'Curaleaf Labs',items:[],placed:false,po:null,status:null,invoice:null,tracking:null,held:false,holdReason:null,autoPlaced:false,simIssue:false};}
+function blankPO(pid){return {id:++nextPat,patientId:pid||null,feeExtra:0,date:new Date(),notifications:[],payment:{status:'none',channel:'both',amount:0,ref:null,sentAt:null,reminders:[],expired:false},prescriptions:[blankRx()]};}
+(function(){
+  const o=blankPO('P-1001');
+  o.prescriptions[0].prescriber='Dr. A. Lee'; o.prescriptions[0].copy='prescription_jdoe_1.pdf';
+  o.prescriptions[0].items=[{name:'Adven 20/1 THC Oil 30ml',qty:2,cost:42,retail:79,fee:0},{name:'Curaleaf CBD 50 Oil 50ml',qty:1,cost:30,retail:59,fee:0}];
+  const rx2=blankRx(); rx2.prescriber='Dr. A. Lee'; rx2.copy='prescription_jdoe_2.pdf'; rx2.items=[{name:'Khiron 20/1 Oil 30ml',qty:1,cost:40,retail:75,fee:0}];
+  o.prescriptions.push(rx2);
+  porders.push(o); activePO=o.id;
+  const o2=blankPO('P-1002'); o2.prescriptions[0].prescriber='Dr. R. Okafor'; o2.prescriptions[0].copy='prescription_asmith.pdf';
+  o2.prescriptions[0].items=[{name:'Noidecs T10:C10 Flos 10g',qty:1,cost:38.5,retail:48,fee:0}];
+  o2.date=new Date(new Date().getFullYear(),new Date().getMonth(),1,9,0); // earlier this month (demo)
+  porders.push(o2);
+})();
+
+const money=n=>'£'+n.toFixed(2);
+const baseMargin=p=>Math.round((1-p.cost/p.retail)*100);
+const po=id=>porders.find(o=>o.id===id);
+const pat=o=>crm.find(c=>c.id===o.patientId);
+const rxOf=(o,rid)=>o.prescriptions.find(r=>r.id===rid);
+const lineCost=i=>i.cost*i.qty;
+const lineRev=i=>i.retail*i.qty+(i.fee||0);
+const lineMargin=i=>{const r=lineRev(i);return r>0?Math.round((r-lineCost(i))/r*100):0;};
+const rxCost=r=>r.items.reduce((t,i)=>t+lineCost(i),0);
+const rxRev=r=>r.items.reduce((t,i)=>t+lineRev(i),0);
+const rxSubtotal=o=>o.prescriptions.reduce((t,r)=>t+rxRev(r),0);
+const poRev=o=>rxSubtotal(o)+(o.feeExtra||0);
+const poCost=o=>o.prescriptions.reduce((t,r)=>t+rxCost(r),0);
+const poComplete=o=>o.patientId && o.prescriptions.length>0 && o.prescriptions.every(r=>r.items.length>0 && r.copy);
+const rxReady=(o,r)=>o.payment.status==='paid' && r.copy && r.items.length>0 && !r.placed && !r.held;
+const allPlaced=()=>{let a=[];porders.forEach(o=>o.prescriptions.forEach(r=>{if(r.placed)a.push({o,r});}));return a;};
+const readyCount=()=>{let n=0;porders.forEach(o=>o.prescriptions.forEach(r=>{if(rxReady(o,r))n++;}));return n;};
+const inPeriod=o=>{const d=o.date||new Date(),n=new Date();return homeView==='today'?(d.toDateString()===n.toDateString()):(d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth());};
+
+function go(scr){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('scr-'+scr).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.scr===scr));
+  ({home:renderHome,referrals:renderReferrals,formulary:renderFormulary,create:renderCreate,review:renderReview,orders:renderOrders,patients:renderPatients})[scr]();
+  updateBadges();
+}
+
+function renderFormulary(){
+  const q=(document.getElementById('catsearch')?document.getElementById('catsearch').value:'').toLowerCase().trim();
+  const fc=document.getElementById('cat-filters');
+  if(fc){fc.innerHTML=`<span class="chip ${catFilters.size===0?'active':''}" onclick="toggleCatFilter('all')">All</span>`
+    +Object.keys(TYPE_LABELS).map(t=>`<span class="chip ${catFilters.has(t)?'active':''}" onclick="toggleCatFilter('${t}')">${TYPE_LABELS[t]}</span>`).join('');}
+  let h='<tr><th>Product</th><th class="right">Cost</th><th class="right">Patient price</th><th class="right">Margin</th><th></th></tr>';
+  let shown=0;
+  catalogue.forEach((p,i)=>{
+    if(q && !p.name.toLowerCase().includes(q)) return;
+    if(catFilters.size>0 && !catFilters.has(p.type)) return;
+    shown++;
+    const cls=p.stock==='low'?'row-low':(p.stock==='out'?'row-out':'');
+    const m=p.stock==='out'?'—':baseMargin(p)+'%';
+    const mcls=p.stock==='out'?'':(baseMargin(p)<25?'warnT':'pos');
+    const act=p.stock==='out'?'<span class="tiny" style="color:var(--red)">Out of stock</span>':`<button class="btn" onclick="startAssign(${i})">+ Add to Rx</button>`;
+    h+=`<tr class="${cls}"><td><span class="dot ${p.stock==='low'?'a':(p.stock==='out'?'r':'g')}"></span>${p.name} <span class="tiny" style="color:var(--tt)">· ${TYPE_LABELS[p.type].replace(' (Flos)','')}</span></td>
+      <td class="right muted">${money(p.cost)}</td><td class="right">${money(p.retail)}</td>
+      <td class="right ${mcls}">${m}${baseMargin(p)<25&&p.stock!=='out'?' ⚠':''}</td><td class="right">${act}</td></tr>`;
+  });
+  if(shown===0) h+=`<tr><td colspan="5"><div class="empty">No products match your search and filters.</div></td></tr>`;
+  document.getElementById('cat-table').innerHTML=h;
+  const cc=document.getElementById('cat-count'); if(cc) cc.textContent=shown+' product'+(shown===1?'':'s')+' shown';
+}
+function toggleCatFilter(t){if(t==='all'){catFilters.clear();}else{if(catFilters.has(t))catFilters.delete(t);else catFilters.add(t);}renderFormulary();}
+function clearCatSearch(){const el=document.getElementById('catsearch');if(el)el.value='';renderFormulary();}
+
+function startAssign(i){
+  pendingProduct=catalogue[i];
+  let opts='';
+  porders.filter(o=>o.payment.status==='none').forEach(o=>{const p=pat(o);o.prescriptions.forEach(r=>{
+    opts+=`<button class="btn opt" onclick="addToRx(${o.id},${r.id})">Add to ${p?p.name:'(no patient)'} · Rx #${r.id}</button>`;});});
+  document.getElementById('assign-box').innerHTML=`<div class="assign"><h3>Assign “${pendingProduct.name}”</h3>
+    <p class="tiny" style="margin:-4px 0 9px;">Every product belongs to a prescription. Prescriptions for the same patient share one payment link.</p>
+    ${opts}<button class="btn opt primary" onclick="assignNewPO()">+ New patient order (new prescription)</button>
+    <button class="btn" style="margin-top:4px;" onclick="closeAssign()">Cancel</button></div>`;
+  document.getElementById('assign-box').scrollIntoView({block:'nearest'});
+}
+function closeAssign(){document.getElementById('assign-box').innerHTML='';pendingProduct=null;}
+function newItem(p){return {name:p.name,qty:1,cost:p.cost,retail:p.retail,fee:0};}
+function resetPay(o){if(o.payment.status!=='none')o.payment={status:'none',channel:o.payment.channel,amount:0,ref:null};}
+function addToRx(oid,rid){const o=po(oid),r=rxOf(o,rid);const ex=r.items.find(i=>i.name===pendingProduct.name);if(ex)ex.qty++;else r.items.push(newItem(pendingProduct));resetPay(o);activePO=oid;closeAssign();go('create');}
+function assignNewPO(){const o=blankPO();o.prescriptions[0].items.push(newItem(pendingProduct));porders.push(o);activePO=o.id;closeAssign();go('create');}
+
+function renderStepbar(){
+  const labels=['Patient','Prescriptions & products','Send payment link'];
+  const o=activePO?po(activePO):null;
+  const cur=!o?0:(!o.patientId?0:(!poComplete(o)?1:2));
+  document.getElementById('stepbar').innerHTML=labels.map((l,i)=>{
+    const cls=i<cur?'done':(i===cur?'cur':'');
+    return `<div class="step ${cls}"><span class="num">${i<cur?'✓':(i+1)}</span>${l}</div>`+(i<labels.length-1?'<span class="muted">›</span>':'');
+  }).join('');
+}
+
+function rxCardHtml(o,r){
+  const idx=o.prescriptions.indexOf(r);
+  if(r.placed){
+    const canUndo=r.status===0;
+    return `<div class="rxcard"><div class="rxhd"><span style="font-weight:600;font-size:13px">Prescription #${r.id}</span><span class="pill info">${r.po} · ${STATUSES[r.status]}</span></div>
+      <div class="tiny">${r.items.length} item(s) · supplier ${money(rxCost(r))} · ${r.autoPlaced?'placed automatically on payment':'placed with Curaleaf'}</div>
+      ${canUndo?`<button class="btn" style="margin-top:8px" onclick="undoPlace(${o.id},${r.id})">Undo / cancel (Curaleaf hasn't approved yet)</button>`:'<div class="tiny" style="margin-top:6px;color:var(--green)">Approved by Curaleaf — can no longer be cancelled here</div>'}</div>`;
+  }
+  if(r.held){
+    return `<div class="rxcard" style="border-color:#E6C98A"><div class="rxhd"><span style="font-weight:600;font-size:13px">Prescription #${r.id}</span><span class="pill amber">Held — needs review</span></div>
+      <div class="tiny" style="margin-bottom:8px">${r.holdReason} the patient has paid, but this prescription was not auto-placed. Re-check stock/price, then place.</div>
+      <label class="tiny" style="display:block;margin-bottom:8px"><input type="checkbox" ${r.simIssue?'checked':''} onchange="toggleSim(${o.id},${r.id},this.checked)"> Demo: stock/price issue still present</label>
+      <button class="btn primary" onclick="recheckPlace(${o.id},${r.id})">Re-check &amp; place</button></div>`;
+  }
+  let up=r.copy
+    ?`<div class="upload has"><div class="fileicon">📄</div><div style="flex:1"><div style="font-weight:600;font-size:12px">${r.copy}</div><div class="tiny">uploaded</div></div><span class="pill ok">✓ copy</span></div>`
+    :`<div class="upload"><div class="fileicon">⤓</div><div style="flex:1"><div style="font-weight:600;font-size:12px">No prescription copy</div><div class="tiny">required to place this prescription</div></div><button class="btn primary" onclick="uploadCopy(${o.id},${r.id})">Upload</button></div>`;
+  let opts='<option value="">Search the formulary to add…</option>';
+  catalogue.filter(x=>x.stock!=='out').forEach(x=>{opts+=`<option value="${x.name}">${x.name} — patient ${money(x.retail)}</option>`;});
+  let items=r.items.length?`<div class="itemlist">${r.items.map((it,ii)=>{
+    const lm=lineMargin(it),low=lm<25,fees=[5,10,15];
+    const fb=low?`<div class="feebar">⚠ Margin ${lm}% — below 25%. Dispensing fee:<span class="feebtns">${fees.map(f=>`<button class="feebtn ${it.fee===f?'on':''}" onclick="setFee(${o.id},${r.id},${ii},${f})">£${f}</button>`).join('')}<button class="feebtn ${!it.fee?'on':''}" onclick="setFee(${o.id},${r.id},${ii},0)">none</button></span></div>`:'';
+    return `<div class="iblock"><div class="itop"><span>${it.name}</span><span class="qty"><button class="qtybtn" onclick="chQty(${o.id},${r.id},${ii},-1)">−</button>${it.qty}<button class="qtybtn" onclick="chQty(${o.id},${r.id},${ii},1)">+</button><span style="min-width:58px;text-align:right">${money(lineRev(it))}</span><button class="qtybtn" onclick="rmItem(${o.id},${r.id},${ii})">🗑</button></span></div>
+      <div class="imeta"><span class="muted">cost ${money(lineCost(it))}</span><span class="${low?'warnT':'pos'}">margin ${lm}%</span>${it.fee?`<span class="pill amber">+£${it.fee}</span>`:''}</div>${fb}</div>`;
+  }).join('')}</div>`:`<div class="itemlist"><div class="empty">No items yet.</div></div>`;
+  const rm=o.prescriptions.length>1?`<button class="btn" onclick="removeRx(${o.id},${r.id})">Remove</button>`:'';
+  return `<div class="rxcard"><div class="rxhd">
+      <span style="font-weight:600;font-size:13px">Prescription #${r.id}</span>${rm}</div>
+    ${up}
+    <div class="searchrow"><select class="fi" id="prodsel-${r.id}">${opts}</select><button class="btn primary" onclick="addItem(${o.id},${r.id})">Add</button></div>
+    ${items}
+    <div class="totline" style="border-top:1px solid var(--bord);margin-top:4px"><span class="muted">Prescription total (patient)</span><span style="font-weight:600">${money(rxRev(r))}</span></div>
+    <label class="tiny" style="display:block;margin-top:8px;color:var(--tt)"><input type="checkbox" ${r.simIssue?'checked':''} onchange="toggleSim(${o.id},${r.id},this.checked)"> Demo: simulate a stock/price change on this Rx at payment time</label></div>`;
+}
+
+function renderCreate(){
+  const createList=porders.filter(o=>o.payment.status==='none');
+  if(!createList.find(o=>o.id===activePO)) activePO=createList[0]?createList[0].id:null;
+  renderStepbar();
+  const chips=createList.map(o=>{const p=pat(o);return `<span class="chip ${o.id===activePO?'active':''}" onclick="activePO=${o.id};renderCreate()">${p?p.name:'New patient'} · ${o.prescriptions.length} Rx</span>`;}).join('')
+    +`<span class="chip" onclick="newPatientOrder()">+ New patient order</span>`;
+  document.getElementById('po-chips').innerHTML=chips;
+  if(!activePO){document.getElementById('builder').innerHTML=`<div class="empty" style="padding:34px;line-height:1.7">No orders in progress.<br>Start one with “+ New patient order” above, or add a product from the Formulary.<br><br>Orders with a payment link sent are in the <a class="link" onclick="go('review')">Awaiting payment</a> tab.</div>`;return;}
+  const o=po(activePO),p=pat(o);
+
+  let patBlock=p
+    ?`<div class="patcard"><div class="avatar">${p.name.split(' ').map(x=>x[0]).join('')}</div>
+       <div style="flex:1"><div style="font-weight:600;font-size:13px">${p.name} <span class="pill ok" style="margin-left:4px">${p.status}</span></div>
+       <div class="tiny" style="margin-top:3px;line-height:1.6">${p.email} · ${p.mobile}<br>${p.address}</div></div>
+       <button class="btn" onclick="clearPatient()">Change</button></div>`
+    :`<div class="searchrow"><select class="fi" id="patsel"><option value="">Search HHH CRM for referred patient…</option>${crm.map(c=>`<option value="${c.id}">${c.name} · ${c.id} · ${c.mobile}</option>`).join('')}</select><button class="btn primary" onclick="selectPatient()">Link</button></div>`;
+
+  let rxList=o.prescriptions.map(r=>rxCardHtml(o,r)).join('')
+    +`<button class="btn" onclick="addRx(${o.id})">+ Add another prescription for this patient</button>`;
+
+  // payment (one link per patient) — compose & send only
+  let pay;
+  if(!o.patientId){ pay='<div class="paybox"><div class="tiny">Link a patient to take payment.</div></div>'; }
+  else {
+    const ready=poComplete(o); const fees=[5,10,15];
+    pay=`<div class="paybox">
+      <div class="totline" style="padding:0 0 4px"><span class="muted">Prescriptions subtotal · ${o.prescriptions.length} Rx</span><span>${money(rxSubtotal(o))}</span></div>
+      <div style="background:var(--sec);border-radius:7px;padding:9px 10px;margin:4px 0 10px">
+        <div class="tiny" style="margin-bottom:6px">Additional dispensing fee for this order <span class="muted">(recommended £5–15)</span></div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          ${fees.map(f=>`<button class="feebtn ${o.feeExtra===f?'on':''}" onclick="setOrderFee(${o.id},${f})">£${f}</button>`).join('')}
+          <span class="tiny">or £</span><input class="tiny-in" style="width:72px" type="number" min="0" step="0.5" value="${o.feeExtra||''}" placeholder="0" onchange="setOrderFeeCustom(${o.id},this.value)">
+          ${o.feeExtra?`<button class="feebtn" onclick="setOrderFee(${o.id},0)">clear</button>`:''}
+        </div>
+        ${o.feeExtra?`<div class="tiny" style="margin-top:6px;color:var(--green)">+ ${money(o.feeExtra)} dispensing fee added</div>`:''}
+      </div>
+      <div class="totline" style="border-top:1px solid var(--bord);padding-top:6px"><span style="font-weight:600">Payment total (one link)</span><span style="font-weight:600">${money(poRev(o))}</span></div>
+      <label class="tiny" style="margin-top:8px;display:block">Send via</label>
+      <select class="fi" id="paychan" style="margin:4px 0 10px" onchange="po(${o.id}).payment.channel=this.value">
+        <option value="both"${o.payment.channel==='both'?' selected':''}>Email + SMS</option>
+        <option value="email"${o.payment.channel==='email'?' selected':''}>Email only</option>
+        <option value="sms"${o.payment.channel==='sms'?' selected':''}>SMS only</option></select>
+      <label class="tiny" style="display:block;margin:0 0 10px"><input type="checkbox" ${autoPlace?'checked':''} onchange="setAutoPlace(this.checked)"> Auto-place each prescription with Curaleaf as soon as it's paid (runs a stock/price re-check first)</label>
+      <button class="btn primary" style="width:100%" onclick="sendLink(${o.id})" ${ready?'':'disabled'}>Send payment link &amp; move to Awaiting payment</button>
+      ${ready?'':'<div class="tiny" style="margin-top:7px">Every prescription needs a copy and at least one item before sending the link.</div>'}</div>`;
+  }
+
+  document.getElementById('builder').innerHTML=`
+    <h2>Create patient order${p?' · '+p.name:''}</h2>
+    <div class="sec-h"><span class="n">1</span>Patient (from HHH CRM)</div>${patBlock}
+    <div class="sec-h"><span class="n">2</span>Prescriptions &amp; products</div>${rxList}
+    <div class="sec-h"><span class="n">3</span>Patient payment (one link)</div>${pay}`;
+}
+
+function selectPatient(){const v=document.getElementById('patsel').value;if(!v)return;po(activePO).patientId=v;renderCreate();}
+function clearPatient(){const o=po(activePO);o.patientId=null;resetPay(o);renderCreate();}
+function setFee(oid,rid,ii,f){const o=po(oid);rxOf(o,rid).items[ii].fee=f;resetPay(o);renderCreate();}
+function uploadCopy(oid,rid){const o=po(oid),r=rxOf(o,rid),p=pat(o);r.copy='prescription_'+(p?p.name.toLowerCase().split(' ')[0]:'rx')+'_'+r.id+'.pdf';resetPay(o);renderCreate();}
+function addRx(oid){po(oid).prescriptions.push(blankRx());resetPay(po(oid));renderCreate();}
+function removeRx(oid,rid){const o=po(oid);o.prescriptions=o.prescriptions.filter(r=>r.id!==rid);resetPay(o);renderCreate();}
+function newPatientOrder(){const o=blankPO();porders.push(o);activePO=o.id;renderCreate();}
+function addItem(oid,rid){const v=document.getElementById('prodsel-'+rid).value;if(!v)return;const p=catalogue.find(c=>c.name===v);const o=po(oid),r=rxOf(o,rid);const ex=r.items.find(i=>i.name===v);if(ex)ex.qty++;else r.items.push(newItem(p));resetPay(o);renderCreate();}
+function chQty(oid,rid,ii,d){const o=po(oid),r=rxOf(o,rid);r.items[ii].qty+=d;if(r.items[ii].qty<1)r.items.splice(ii,1);resetPay(o);renderCreate();}
+function rmItem(oid,rid,ii){const o=po(oid),r=rxOf(o,rid);r.items.splice(ii,1);resetPay(o);renderCreate();}
+function sendLink(oid){const o=po(oid);o.payment.status='sent';o.payment.amount=poRev(o);o.payment.ref='PAY-'+Math.floor(10000+Math.random()*89999);o.payment.sentAt=nowMs();o.payment.reminders=[];o.payment.expired=false;const p=pat(o);notify(o,'Payment request',(p?'Hi '+p.name.split(' ')[0]+', ':'')+'your prescription order from Holistic Health Hub is ready. Please pay '+money(o.payment.amount)+' via your secure link.','Worldpay');activePO=null;go('review');}
+function markPaid(oid){const o=po(oid);o.payment.status='paid';const p=pat(o);notify(o,'Payment received',(p?'Thanks '+p.name.split(' ')[0]+', ':'')+'we have received your '+money(o.payment.amount)+' payment.','Worldpay');if(autoPlace)autoPlaceOrder(o.id);rerender();}
+function sendReminder(oid){const o=po(oid);const p=pat(o);notify(o,'Payment reminder',(p?'Hi '+p.name.split(' ')[0]+', ':'')+'a reminder that your prescription order is waiting for payment ('+money(o.payment.amount)+'). Your secure link is still active.','Worldpay');rerender();}
+function setOrderFee(oid,f){po(oid).feeExtra=f;renderCreate();}
+function setOrderFeeCustom(oid,v){po(oid).feeExtra=Math.max(0,parseFloat(v)||0);renderCreate();}
+function previewLink(oid){
+  const o=po(oid),p=pat(o);
+  const rows=o.prescriptions.map(r=>`<div class="tiny" style="font-weight:600;margin-top:6px">Prescription #${r.id}</div>`+r.items.map(i=>`<div class="totline" style="padding:1px 0"><span>${i.name} ×${i.qty}</span><span>${money(lineRev(i))}</span></div>`).join('')).join('')
+    +(o.feeExtra?`<div class="totline" style="padding:4px 0 1px;margin-top:4px"><span>Dispensing fee</span><span>${money(o.feeExtra)}</span></div>`:'');
+  const html=`<div class="modalwrap" id="paymodal"><div class="phone"><div class="phonehd">Secure payment · Holistic Health Hub</div>
+    <div style="padding:16px"><div style="font-size:13px;font-weight:600;margin-bottom:4px">Hi ${p.name.split(' ')[0]},</div>
+    <p class="tiny" style="line-height:1.6">Your prescriptions from Holistic Health Hub are ready. One payment covers them all.</p>
+    <div class="card" style="margin:10px 0">${rows}<div class="totline" style="border-top:1px solid var(--bord);margin-top:6px"><span style="font-weight:600">Total</span><span style="font-weight:600">${money(poRev(o))}</span></div></div>
+    <button class="btn primary" style="width:100%" onclick="payFromPhone(${o.id})">Pay ${money(poRev(o))} now</button>
+    <button class="btn" style="width:100%;margin-top:6px" onclick="closeModal()">Close preview</button>
+    <p class="tiny" style="text-align:center;margin-top:8px">🔒 Secured payment</p></div></div></div>`;
+  const w=document.createElement('div');w.innerHTML=html;(document.querySelector('.screen.active')||document.getElementById('scr-create')).appendChild(w.firstChild);
+}
+function closeModal(){const m=document.getElementById('paymodal');if(m)m.remove();}
+function payFromPhone(oid){closeModal();markPaid(oid);}
+
+function reCheck(o,r){ if(r.simIssue) return {ok:false,reason:'Stock/price changed since the basket was built —'}; return {ok:true}; }
+function doPlace(o,r,auto){ r.placed=true; r.po='PO-'+(nextPO++); r.status=0; r.autoPlaced=!!auto; r.held=false; r.holdReason=null; }
+function placeRx(oid,rid){const o=po(oid),r=rxOf(o,rid);if(!rxReady(o,r))return;doPlace(o,r,false);rerender();}
+function placeAllReady(){porders.forEach(o=>o.prescriptions.forEach(r=>{if(rxReady(o,r))doPlace(o,r,false);}));rerender();}
+function autoPlaceOrder(oid){const o=po(oid);o.prescriptions.forEach(r=>{if(r.placed||!r.copy||r.items.length===0)return;const c=reCheck(o,r);if(c.ok)doPlace(o,r,true);else{r.held=true;r.holdReason=c.reason;}});}
+function recheckPlace(oid,rid){const o=po(oid),r=rxOf(o,rid);const c=reCheck(o,r);if(c.ok)doPlace(o,r,false);else{r.held=true;r.holdReason=c.reason;}rerender();}
+function undoPlace(oid,rid){const o=po(oid),r=rxOf(o,rid);if(r.status!==0)return;r.placed=false;r.po=null;r.status=null;r.autoPlaced=false;rerender();}
+function toggleSim(oid,rid,v){rxOf(po(oid),rid).simIssue=v;rerender();}
+function setAutoPlace(v){autoPlace=v;renderCreate();}
+function rerender(){const a=document.querySelector('.screen.active');const id=a?a.id.replace('scr-',''):'create';({home:renderHome,referrals:renderReferrals,formulary:renderFormulary,create:renderCreate,review:renderReview,orders:renderOrders,patients:renderPatients}[id]||renderCreate)();updateBadges();}
+function notify(o,title,body,via){(o.notifications=o.notifications||[]).push({ts:new Date(),via:via||'',title,body});}
+function fmtTime(d){try{return new Date(d).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}
+function renderNotifs(o){const ns=o.notifications||[];if(!ns.length)return '';
+  const rows=ns.slice().reverse().map(n=>`<div class="totline" style="align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--bord)"><span style="max-width:74%"><span style="font-weight:600">${n.title}</span> ${n.via?`<span class="tiny" style="color:var(--tt)">· via ${n.via}</span>`:''}<br><span class="tiny">${n.body}</span></span><span class="tiny" style="color:var(--tt);white-space:nowrap">${fmtTime(n.ts)}</span></div>`).join('');
+  return `<div style="margin-top:8px;border-top:1px solid var(--bord);padding-top:8px"><div class="tiny" style="font-weight:600;margin-bottom:2px">✉ Patient notifications (${ns.length})</div><div class="tiny" style="color:var(--tt);margin-bottom:2px">Pay &amp; paid via Worldpay · collection via connected SMS/email app</div>${rows}</div>`;}
+
+function nowMs(){return Date.now()+clockMs;}
+function elapsedH(o){return o.payment.sentAt?Math.floor((nowMs()-o.payment.sentAt)/H):0;}
+function checkAuto(){porders.forEach(o=>{const pm=o.payment;if(pm.status!=='sent'||!pm.sentAt)return;const eh=(nowMs()-pm.sentAt)/H;REMIND.forEach(t=>{if(t<expiryHrs&&eh>=t&&!pm.reminders.includes(t)&&!pm.expired){const p=pat(o);notify(o,'Payment reminder (automatic)',(p?'Hi '+p.name.split(' ')[0]+', ':'')+'a reminder that your prescription order is awaiting payment ('+money(pm.amount)+'). Your secure link is still active.','Worldpay');pm.reminders.push(t);}});if(eh>=expiryHrs&&!pm.expired)pm.expired=true;});}
+function advanceClock(h){clockMs+=h*H;checkAuto();rerender();}
+function resetClock(){clockMs=0;rerender();}
+function setExpiry(v){expiryHrs=+v;checkAuto();rerender();}
+function resendLink(oid){const o=po(oid),pm=o.payment;pm.sentAt=nowMs();pm.expired=false;pm.reminders=[];const p=pat(o);notify(o,'Payment request (resent)',(p?'Hi '+p.name.split(' ')[0]+', ':'')+'a fresh secure payment link for your prescription order ('+money(pm.amount)+').','Worldpay');rerender();}
+function renderReview(){
+  checkAuto();
+  const awaiting=porders.filter(o=>o.payment.status==='sent' || (o.payment.status==='paid' && o.prescriptions.some(r=>!r.placed)));
+  let html=`<p class="muted" style="font-size:13px;margin-top:-6px;">Orders here have had a payment link sent. When the patient pays, each prescription is placed with Curaleaf (auto-place is ${autoPlace?'on':'off'}); placed prescriptions move to Orders.</p>`;
+  if(!awaiting.length){ document.getElementById('review-body').innerHTML=html+`<div class="empty" style="padding:30px">Nothing awaiting payment. Create an order in the <a class="link" onclick="go('create')">Create order</a> tab.</div>`; return; }
+  const ch=Math.round(clockMs/H);
+  html+=`<div class="card" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between"><span class="tiny">Auto-remind at 24h &amp; 48h · link expires at <select class="fi" style="width:auto;display:inline-block;padding:3px 6px" onchange="setExpiry(this.value)">${[48,72,96].map(v=>`<option value="${v}"${expiryHrs===v?' selected':''}>${v}h</option>`).join('')}</select></span><span class="tiny">Demo clock: +${ch}h <button class="btn" style="padding:3px 8px" onclick="advanceClock(12)">+12h</button> <button class="btn" style="padding:3px 8px" onclick="advanceClock(24)">+24h</button> <button class="btn" style="padding:3px 8px" onclick="resetClock()">reset</button></span></div>`;
+  const rc=readyCount();
+  if(rc>0) html+=`<div class="banner green"><span>✓</span><span>${rc} paid prescription(s) ready to place. <button class="btn" style="margin-left:8px" onclick="placeAllReady()">Place all ready (${rc})</button></span></div>`;
+  awaiting.forEach(o=>{const p=pat(o); const paid=o.payment.status==='paid'; const exp=o.payment.expired;
+    const payPill=paid?'<span class="pill ok">✓ paid '+money(o.payment.amount)+'</span>':(exp?'<span class="pill miss">link expired · '+money(o.payment.amount)+'</span>':'<span class="pill amber">awaiting payment · '+money(o.payment.amount)+'</span>');
+    let rows=o.prescriptions.map(r=>{
+      if(r.placed){const u=r.status===0?` · <a class="link" onclick="undoPlace(${o.id},${r.id})">undo</a>`:'';return `<div class="totline"><span>Rx #${r.id} · ${r.items.length} item(s)${r.autoPlaced?' · auto':''}</span><span class="pill info">${r.po} · ${STATUSES[r.status]}${u}</span></div>`;}
+      if(r.held) return `<div class="totline" style="align-items:center"><span>Rx #${r.id} · ${money(rxCost(r))}</span><span style="display:flex;gap:6px;align-items:center"><span class="pill amber">held: ${r.holdReason||'review'}</span><button class="btn" style="padding:4px 10px" onclick="recheckPlace(${o.id},${r.id})">Re-check &amp; place</button></span></div>`;
+      if(paid){const ready=rxReady(o,r);return `<div class="totline" style="align-items:center"><span>Rx #${r.id} · ${money(rxCost(r))}</span><button class="btn primary" style="padding:4px 10px" onclick="placeRx(${o.id},${r.id})" ${ready?'':'disabled'}>Place</button></div>`;}
+      return `<div class="totline"><span>Rx #${r.id} · ${money(rxCost(r))}</span><span class="tiny">awaiting payment</span></div>`;
+    }).join('');
+    let timeInfo=paid?'':`<div class="tiny" style="margin-bottom:4px">Link sent ${elapsedH(o)}h ago · ${exp?'<span style="color:var(--red)">expired</span>':'expires in '+Math.max(0,expiryHrs-elapsedH(o))+'h'} · ${o.payment.reminders.length} auto-reminder(s) sent</div>`;
+    let actions=paid?'':(exp?`<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn" onclick="previewLink(${o.id})">Preview patient view</button><button class="btn primary" onclick="resendLink(${o.id})">Resend link</button></div>`:`<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn" onclick="previewLink(${o.id})">Preview patient view</button><button class="btn primary" onclick="markPaid(${o.id})">Mark payment received (demo)</button><button class="btn" onclick="sendReminder(${o.id})">Send reminder</button></div>`);
+    html+=`<div class="card" id="rev-${o.id}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-weight:600;font-size:13px">${p?p.name:'New patient'}</span>${payPill}</div>
+      <div class="tiny" style="margin-bottom:6px">${p?p.email+' · '+p.mobile:''} · ${o.prescriptions.length} prescription(s) · one link</div>${timeInfo}${rows}${actions}${renderNotifs(o)}</div>`;
+  });
+  document.getElementById('review-body').innerHTML=html;
+}
+
+function renderOrders(){
+  const placed=allPlaced();
+  if(!placed.length){document.getElementById('orders-body').innerHTML='<p class="tiny">No prescriptions placed yet. Take patient payment, then place each prescription with Curaleaf.</p>';return;}
+  document.getElementById('orders-body').innerHTML=placed.map(({o,r})=>{const p=pat(o),st=r.status;
+    const trk=STATUSES.map((l,i)=>`<div class="tstep ${i<=st?'done':''}"><div class="tbar"></div>${l.split(' ')[0]}</div>`).join('');
+    let info=`<div class="kv"><span class="muted">Patient payment</span><span style="color:var(--green)">✓ ${o.payment.ref} (covers ${o.prescriptions.length} Rx)</span></div>`;
+    info+=`<div class="kv"><span class="muted">Purchase order</span><span>${r.po} · ${r.autoPlaced?'auto-placed on payment':'placed manually'}</span></div>`;
+    if(st>=1)info+=`<div class="kv"><span class="muted">Curaleaf invoice</span><span>${r.invoice} · <a class="link" onclick="alert('Opening ${r.invoice} (demo)')">view</a></span></div>`;
+    if(st>=2)info+=`<div class="kv"><span class="muted">Courier (Curaleaf → pharmacy)</span><span>${r.carrier||'DPD'} · ${r.tracking} · <a class="link" onclick="alert('Tracking ${r.tracking} (demo)')">track</a></span></div>`;
+    const bc=st===0?'amber':(st===3?'ok':'info');
+    let adv;
+    if(st<2){adv=`<button class="btn" style="margin-top:8px;" onclick="advance(${o.id},${r.id})">Simulate next update (polling)</button>${st===0?` <button class="btn" onclick="undoPlace(${o.id},${r.id})">Cancel (undo)</button>`:''}`;}
+    else if(st===2){adv=`<button class="btn primary" style="margin-top:8px;" onclick="markReceived(${o.id},${r.id})">Mark received at pharmacy</button><div class="tiny" style="margin-top:6px;color:var(--tt)">In transit via ${r.carrier||'DPD'}. Confirm goods-in to notify the patient it's ready to collect.</div>`;}
+    else{adv='<div class="tiny" style="margin-top:8px;color:var(--green)">✓ Ready for collection — patient notified</div>';}
+    return `<div class="card" id="ord-${o.id}-${r.id}"><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:600;font-size:13px;">${p?p.name:'—'} · Rx #${r.id}</span><span class="pill ${bc}">${STATUSES[st]}</span></div>
+      <div class="tiny" style="margin-top:3px;">${r.supplier} · ${r.items.length} item(s) · copy: ${r.copy}</div>
+      <div class="track">${trk}</div>${info}${adv}${renderNotifs(o)}</div>`;}).join('');
+}
+function advance(oid,rid){const o=po(oid),r=rxOf(o,rid);if(r.status<2)r.status++;if(r.status===1&&!r.invoice)r.invoice='INV-'+(nextInv++);if(r.status===2&&!r.tracking){r.tracking='CL'+Math.floor(100000+Math.random()*900000)+'GB';r.carrier='DPD';}renderOrders();}
+function markReceived(oid,rid){const o=po(oid),r=rxOf(o,rid);if(r.status!==2)return;r.status=3;const p=pat(o);notify(o,'Ready for collection',(p?'Hi '+p.name.split(' ')[0]+', ':'')+'your medication (Rx #'+r.id+') is ready to collect from the pharmacy.','SMS / Email');renderOrders();}
+function setBadge(scr,n){const el=document.getElementById('b-'+scr);if(!el)return;el.classList.toggle('attn',scr==='home');if(n>0){el.textContent=n;el.style.display='';}else{el.style.display='none';}}
+function updateBadges(){
+  const inProgress=porders.filter(o=>o.payment.status==='none').length;
+  const awaiting=porders.filter(o=>o.payment.status==='sent'||(o.payment.status==='paid'&&o.prescriptions.some(r=>!r.placed))).length;
+  let fulfil=0,sent=0,held=0,ready=0;
+  porders.forEach(o=>{if(o.payment.status==='sent')sent++;o.prescriptions.forEach(r=>{if(r.placed&&r.status<3)fulfil++;if(r.held)held++;if(rxReady(o,r))ready++;});});
+  const newSubs=submissions.filter(s=>s.status!=='Completed').length;
+  setBadge('create',inProgress);setBadge('review',awaiting);setBadge('orders',fulfil);setBadge('referrals',newSubs);setBadge('home',sent+held+ready+newSubs);
+}
+function renderHome(){
+  checkAuto();
+  // current-state triage (not period-filtered)
+  const awaiting=porders.filter(o=>o.payment.status==='sent');
+  const expiredCount=porders.filter(o=>o.payment.status==='sent'&&o.payment.expired).length;
+  const newSubs=submissions.filter(s=>s.status!=='Completed').length;
+  const inProgress=porders.filter(o=>o.payment.status==='none');
+  let readyNow=0,heldNow=0,fulfilNow=0;
+  porders.forEach(o=>o.prescriptions.forEach(r=>{if(rxReady(o,r))readyNow++;if(r.held)heldNow++;if(r.placed&&r.status<3)fulfilNow++;}));
+  // figures for the selected period
+  let fees=0,outstanding=0,collected=0,placed=0,delivered=0,awaitCount=0;
+  porders.filter(inPeriod).forEach(o=>{
+    o.prescriptions.forEach(r=>{r.items.forEach(i=>fees+=(i.fee||0));if(r.placed){placed++;if(r.status===3)delivered++;}});
+    if(o.payment.status==='sent'){outstanding+=o.payment.amount;awaitCount++;}
+    if(o.payment.status==='paid')collected+=o.payment.amount;
+  });
+  const pl=homeView==='today'?'today':'this month';
+  const toggle=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span class="chip ${homeView==='today'?'active':''}" onclick="setHomeView('today')">Today</span><span class="chip ${homeView==='month'?'active':''}" onclick="setHomeView('month')">This month</span><span class="tiny">figures for ${pl}</span></div>`;
+  const metric=(label,val,sub)=>`<div style="background:var(--sec);border-radius:8px;padding:12px 14px"><div class="tiny" style="margin-bottom:4px">${label}</div><div style="font-size:22px;font-weight:600">${val}</div>${sub?`<div class="tiny" style="margin-top:2px">${sub}</div>`:''}</div>`;
+  const metrics=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px">
+    ${metric('Awaiting payment',money(outstanding),awaitCount+' order(s)')}
+    ${metric('Collected',money(collected),'paid by patients')}
+    ${metric('Dispensing fees',money(fees),'pharmacy revenue')}
+    ${metric('Prescriptions placed',placed,delivered+' ready to collect')}</div>`;
+  const row=(icon,tone,text,btn,scr)=>`<div class="totline" style="align-items:center"><span><span style="color:var(--${tone})">${icon}</span> ${text}</span><button class="btn" onclick="go('${scr}')">${btn}</button></div>`;
+  let attn='';
+  if(newSubs) attn+=row('●','infoT',`${newSubs} eligibility referral(s) to process`,'Open','referrals');
+  if(awaiting.length) attn+=row('●','amber',`${awaiting.length} order(s) awaiting patient payment`,'Open','review');
+  if(expiredCount) attn+=row('▲','red',`${expiredCount} payment link(s) expired — resend`,'Resend','review');
+  if(readyNow) attn+=row('●','green',`${readyNow} prescription(s) paid and ready to place`,'Place','review');
+  if(heldNow) attn+=row('▲','red',`${heldNow} prescription(s) held — stock/price needs review`,'Review','review');
+  if(fulfilNow) attn+=row('●','infoT',`${fulfilNow} prescription(s) in fulfilment with Curaleaf`,'Track','orders');
+  if(!attn) attn=`<div class="tiny" style="padding:6px 0">✓ Nothing needs attention right now.</div>`;
+  const ip=inProgress.length?`<div class="sec-h"><span class="n">+</span>Orders in progress</div><div class="card">${inProgress.map(o=>{const p=pat(o);return `<div class="totline"><span>${p?p.name:'New patient'} · ${o.prescriptions.length} Rx · ${money(poRev(o))}</span><a class="link" onclick="activePO=${o.id};go('create')">continue</a></div>`;}).join('')}</div>`:'';
+  document.getElementById('home-body').innerHTML=`
+    <h2 style="margin-bottom:2px">Dashboard</h2>
+    <p class="tiny" style="margin:0 0 14px">Holistic Health Hub · overview</p>
+    ${toggle}${metrics}
+    <div class="sec-h" style="margin-top:0"><span class="n">!</span>Needs attention <span class="tiny" style="font-weight:400;color:var(--tt)">(live)</span></div><div class="card">${attn}</div>
+    ${ip}`;
+}
+function setHomeView(v){homeView=v;renderHome();}
+function resetDemo(){location.reload();}
+renderHome();updateBadges();
+</script>
+</body>
+</html>
